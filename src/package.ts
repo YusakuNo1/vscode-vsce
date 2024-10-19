@@ -27,6 +27,7 @@ import * as GitHost from 'hosted-git-info';
 import parseSemver from 'parse-semver';
 import * as jsonc from 'jsonc-parser';
 import * as vsceSign from '@vscode/vsce-sign';
+import { updateFilePaths } from './pathutils';
 
 const MinimatchOptions: minimatch.IOptions = { dot: true };
 
@@ -1274,17 +1275,19 @@ export class ValidationProcessor extends BaseProcessor {
 			return;
 		}
 
-		const messages = [
-			`The following files have the same case insensitive path, which isn't supported by the VSIX format:`,
-		];
+		// Comment out the following code to allow duplicate files, it's because in npm workspaces, the packages are referenced 2 times
 
-		for (const lower of this.duplicates) {
-			for (const filePath of this.files.get(lower)!) {
-				messages.push(`  - ${filePath}`);
-			}
-		}
+		// const messages = [
+		// 	`The following files have the same case insensitive path, which isn't supported by the VSIX format:`,
+		// ];
 
-		throw new Error(messages.join('\n'));
+		// for (const lower of this.duplicates) {
+		// 	for (const filePath of this.files.get(lower)!) {
+		// 		messages.push(`  - ${filePath}`);
+		// 	}
+		// }
+
+		// throw new Error(messages.join('\n'));
 	}
 }
 
@@ -1790,6 +1793,8 @@ export function collect(manifest: ManifestPackage, options: IPackageOptions = {}
 }
 
 function writeVsix(files: IFile[], packagePath: string): Promise<void> {
+	files = updateFilePaths(files);
+
 	return fs.promises
 		.unlink(packagePath)
 		.catch(err => (err.code !== 'ENOENT' ? Promise.reject(err) : Promise.resolve(null)))

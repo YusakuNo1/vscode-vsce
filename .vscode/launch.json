@@ -16,6 +16,19 @@
 			],
 			"sourceMaps": true,
 			"outputCapture": "std"
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Package",
+			"cwd": "<path-to-vsce>",
+			"program": "${workspaceFolder}/vsce",
+			"args": [
+				"package",
+				"--follow-symlinks"
+			],
+			"sourceMaps": true,
+			"outputCapture": "std"
 		}
 	]
 }
